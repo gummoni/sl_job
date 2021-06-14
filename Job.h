@@ -54,14 +54,13 @@ extern job_scheduler* current_scheduler;
 /// </summary>
 /// <param name="self"></param>
 #define job_yield(__self) {										\
-	job* __tmp;													\
-	if (NULL == (__tmp = (job*)setjmp(__self->job.buf))) {		\
-		__tmp = (job*)__self;									\
+	job* __tmp = job_current();									\
+	if (0 == setjmp(__tmp->buf)) {								\
 		longjmp(SuspendJmp, (int)job_state::BUSY);				\
 	}															\
 	else {														\
-		unsigned* __tmp2 = (unsigned*)&self;					\
-		*__tmp2 = (unsigned)__tmp;								\
+		job** __tmp2 = (job**)&__self;							\
+		*__tmp2 = job_current();								\
 	}															\
 }
 
